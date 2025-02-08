@@ -1,9 +1,10 @@
 // Don't send duplicate errors within this window
 const ERROR_WINDOW = 60 * 60; // 1 hour
 
-const IGNORE_URLS = [
-  'favicon.ico',
-  'robots.txt'
+const IGNORE_PATTERNS = [
+  /^favicon\.[^/]+$/,
+  /^robots\.txt$/,
+  /^apple-[^/]+\.png$/
 ];
 
 export default {
@@ -13,7 +14,7 @@ export default {
         const context = extractContext(event);
 
         // Don't send emails for junk requests like favicon or robots
-        if (IGNORE_URLS.includes(context.url)) {
+        if (IGNORE_PATTERNS.some(pattern => pattern.test(context.url))) {
           console.log(`Ignoring URL: ${context.url}`);
           continue;
         }
