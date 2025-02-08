@@ -1,11 +1,22 @@
 // Don't send duplicate errors within this window
 const ERROR_WINDOW = 60 * 60; // 1 hour
 
+const IGNORE_URLS = [
+  'favicon.ico',
+  'robots.txt'
+];
+
 export default {
   async tail(events, env) {
     for (const event of events) {
       if (event.outcome === "exception") {
         const context = extractContext(event);
+
+        // Don't send emails for junk requests like favicon or robots
+        if (IGNORE_URLS.includes(context.url)) {
+          console.log(`Ignoring URL: ${context.url}`);
+          continue;
+        }
 
         // Check if we've seen this error recently
         const errorHash = await generateErrorHash(context);
